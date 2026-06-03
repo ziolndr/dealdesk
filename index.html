@@ -1,0 +1,2124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deal Desk — ARBITER</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <style>
+    /* (all previous styles remain exactly the same — omitted for brevity) */
+    /* Copy all CSS from the last working version here */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #f7f8fa;
+      color: #0b0d10;
+      font-family: 'Inter', system-ui, sans-serif;
+      line-height: 1.4;
+    }
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+    .navbar {
+      position: sticky;
+      top: 0;
+      background: rgba(250,250,248,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #d9dce2;
+      z-index: 100;
+    }
+    .nav-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .logo-symbol {
+      width: 28px;
+      height: 28px;
+      background: #0b0d10;
+      border-radius: 12px;
+      position: relative;
+    }
+    .logo-symbol::after {
+      content: "⨀";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 14px;
+      font-weight: 400;
+    }
+    .logo-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: #0b0d10;
+    }
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: #30343b;
+    }
+    .nav-links a:hover { color: #0b0d10; }
+    .nav-cta {
+      background: #0b0d10;
+      color: white !important;
+      padding: 8px 18px;
+      border-radius: 40px;
+    }
+    h1 {
+      font-family: 'Instrument Serif', serif;
+      font-weight: 400;
+      font-size: clamp(56px, 8vw, 92px);
+      line-height: 0.92;
+      letter-spacing: -0.03em;
+    }
+    h2 {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(36px, 6vw, 56px);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+    }
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #6b7280;
+      margin-bottom: 16px;
+    }
+    section { padding: 80px 0; border-bottom: 1px solid #d9dce2; }
+    .ref-card {
+      background: white;
+      border: 1px solid #e6e5e2;
+      border-radius: 28px;
+      padding: 24px 28px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.02);
+    }
+    .ref-stats {
+      display: flex;
+      gap: 24px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+    .stat {
+      flex: 1;
+      border-left: 2px solid #d9dce2;
+      padding-left: 16px;
+    }
+    .stat-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 32px;
+      font-weight: 600;
+    }
+    .stat-label { font-size: 12px; color: #6b7280; margin-top: 6px; }
+    .tool-card {
+      background: white;
+      border-radius: 32px;
+      border: 1px solid #d9dce2;
+      overflow: hidden;
+    }
+    .tool-header {
+      background: #ffffff;
+      padding: 20px 28px;
+      border-bottom: 1px solid #d9dce2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .badge {
+      background: #e1e4ea;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+    .seg-toggle {
+      display: flex;
+      gap: 4px;
+      background: #d9dce2;
+      padding: 4px;
+      border-radius: 48px;
+    }
+    .seg-toggle button {
+      background: transparent;
+      border: none;
+      padding: 6px 16px;
+      border-radius: 40px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .seg-toggle button.on { background: white; color: #0b0d10; }
+    .tool-body { padding: 28px; }
+    .field { margin-bottom: 28px; }
+    label {
+      font-weight: 600;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    textarea, input, select {
+      width: 100%;
+      border: 1px solid #cfd3da;
+      border-radius: 16px;
+      padding: 12px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      background: #ffffff;
+    }
+    textarea:focus, input:focus { outline: none; border-color: #0b0d10; }
+    .toolbar-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .example-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .example-btn {
+      background: #d9dce2;
+      border: 1px solid #b7bdc7;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+    .example-btn:hover { background: #c7ccd5; }
+    .mini-btn {
+      background: #eceef2;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 40px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .mini-btn.solid { background: #0b0d10; color: white; }
+    .run-btn {
+      background: #0b0d10;
+      color: white;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 48px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      margin-top: 16px;
+    }
+    .privacy-note {
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 12px;
+      border-radius: 16px;
+      margin-bottom: 24px;
+      background: #f7f4f2;
+      border-left: 3px solid #D71920;
+    }
+    .buyer-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .buyer-card {
+      background: #ffffff;
+      border: 1px solid #cfd3da;
+      border-radius: 20px;
+      padding: 16px;
+    }
+    .buyer-card .buyer-name {
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .buyer-card .buyer-name input {
+      flex: 1;
+      margin: 0;
+      background: white;
+    }
+    .buyer-card textarea {
+      font-size: 12px;
+      margin-top: 4px;
+    }
+    .buyer-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .add-buyer-btn {
+      margin-top: 12px;
+      width: 100%;
+      background: #eceef2;
+      border: 1px dashed #bcbbb6;
+    }
+    .brief-output { margin-top: 48px; }
+    .brief-doc {
+      background: white;
+      border-radius: 28px;
+      border: 1px solid #d9dce2;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+    }
+    .brief-header {
+      padding: 24px 28px;
+      background: #ffffff;
+      border-bottom: 1px solid #d9dce2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .brief-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: 28px;
+    }
+    .brief-section {
+      padding: 24px 28px;
+      border-bottom: 1px solid #dfe2e7;
+    }
+    .lens-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .lens-btn {
+      background: #eceef2;
+      border: none;
+      padding: 6px 18px;
+      border-radius: 40px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .lens-btn.active { background: #0b0d10; color: white; }
+    .rank-list { display: flex; flex-direction: column; gap: 16px; }
+    .rank-item { display: flex; flex-direction: column; gap: 4px; }
+    .rank-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+    }
+    .rank-name { font-weight: 500; }
+    .rank-score { font-family: 'JetBrains Mono', monospace; color: #7c7b77; }
+    .bar-bg {
+      background: #d9dce2;
+      border-radius: 20px;
+      height: 6px;
+      width: 100%;
+      overflow: hidden;
+    }
+    .bar-fill {
+      background: #0b0d10;
+      width: 0%;
+      height: 100%;
+      border-radius: 20px;
+      transition: width 0.5s cubic-bezier(0.2,0.9,0.4,1.1);
+    }
+    .rank-item.lead .rank-name { font-weight: 700; color: #0b0d10; }
+    .recommendation {
+      background: #f2f3f5;
+      padding: 24px;
+      border-radius: 20px;
+      margin-top: 12px;
+    }
+    .reco-score {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 42px;
+      font-weight: 600;
+    }
+    .proof-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+    .proof-list { display: flex; flex-direction: column; gap: 16px; }
+    .proof-item {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 16px;
+      font-size: 14px;
+    }
+    .price-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+    .price-card {
+      background: white;
+      border-radius: 28px;
+      border: 1px solid #d9dce2;
+      padding: 32px;
+    }
+    .price-amount {
+      font-family: 'Instrument Serif', serif;
+      font-size: 56px;
+    }
+    footer {
+      padding: 48px 0;
+      text-align: center;
+      font-size: 12px;
+      color: #6b7280;
+      border-top: 1px solid #d9dce2;
+    }
+    @media (max-width: 760px) {
+      .proof-grid, .price-grid { grid-template-columns: 1fr; }
+      .container { padding: 0 20px; }
+      section { padding: 56px 0; }
+    }
+  
+/* institutional weight pass (compact hero) */
+:root {
+  --ink-heavy:#08090b;
+  --ink-soft:#20242a;
+  --paper-heavy:#f6f7f8;
+  --sheet-heavy:#ffffff;
+  --line-heavy:#111111;
+  --line-soft:#d8d8d2;
+  --blue-flat:#D71920;
+}
+body {
+  background: var(--paper-heavy) !important;
+  color: var(--ink-heavy) !important;
+  font-size: 16px;
+  letter-spacing: -0.012em;
+}
+body::before {
+  content:"";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.025) 1px, transparent 1px),
+    linear-gradient(rgba(0,0,0,.018) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: .55;
+}
+.container {
+  max-width: 1400px !important;
+  padding: 0 34px !important;
+}
+.navbar {
+  background: rgba(247,248,250,.95) !important;
+  border-bottom: 2px solid var(--line-heavy) !important;
+}
+.nav-inner {
+  padding: 14px 0 !important;
+}
+.logo {
+  gap: 12px !important;
+}
+.logo-mark {
+  width: 14px;
+  height: 14px;
+  background: var(--ink-heavy);
+  box-shadow: 4px 4px 0 var(--blue-flat);
+  flex: 0 0 auto;
+  transform: translateY(-2px);
+}
+.logo-lockup {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+  gap: 4px;
+}
+.logo-word {
+  font-family: 'Instrument Serif', serif;
+  font-size: 28px;
+  letter-spacing: -.04em;
+  color: var(--ink-heavy);
+}
+.logo-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #666;
+  font-weight: 700;
+}
+.logo-symbol,
+.logo-text {
+  display: none !important;
+}
+main > .container > section:first-child {
+  padding: 48px 0 56px !important;
+  border-bottom: 2px solid var(--line-heavy) !important;
+}
+main > .container > section:first-child > div[style*="display: grid"] {
+  grid-template-columns: minmax(0,1.05fr) minmax(380px,.95fr) !important;
+  gap: 48px !important;
+  align-items: start !important;
+}
+h1 {
+  font-size: clamp(64px, 8vw, 110px) !important;
+  line-height: .82 !important;
+  letter-spacing: -.055em !important;
+  max-width: 7.6ch;
+}
+h2 {
+  font-size: clamp(42px, 6vw, 76px) !important;
+  line-height: .85 !important;
+}
+.eyebrow {
+  color: var(--ink-heavy) !important;
+  font-weight: 700 !important;
+  letter-spacing: .18em !important;
+  margin-bottom: 16px !important;
+}
+.eyebrow::after {
+  content:"";
+  display:block;
+  width: 66px;
+  height: 2px;
+  margin-top: 10px;
+  background: var(--ink-heavy);
+}
+section:first-child p[style*="font-size"] {
+  font-size: 18px !important;
+  line-height: 1.25 !important;
+  margin-top: 16px !important;
+}
+.ref-card {
+  min-height: auto !important;
+  padding: 20px 24px !important;
+  margin-top: 0;
+}
+.ref-card > div:nth-child(2) {
+  font-size: 32px !important;
+}
+.ref-stats {
+  margin-top: 18px !important;
+  gap: 16px;
+}
+.stat {
+  padding: 12px !important;
+}
+.stat-number {
+  font-size: 28px !important;
+}
+.hero-live {
+  margin-top: 20px;
+  width: min(560px, 100%);
+}
+.hero-live-line {
+  min-height: 56px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.run-btn {
+  margin-top: 20px !important;
+  padding: 12px 24px !important;
+  font-size: 14px;
+}
+#how > div[style*="display: grid"] > div {
+  min-height: 180px !important;
+  padding: 20px !important;
+}
+#how > div[style*="display: grid"] > div > div:first-child {
+  font-size: 52px;
+}
+.tool-body {
+  padding: 28px !important;
+}
+@media (max-width: 920px) {
+  main > .container > section:first-child > div[style*="display: grid"] {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+  .ref-card {
+    min-height: auto;
+  }
+}
+@media (max-width: 760px) {
+  .container { padding: 0 20px !important; }
+  h1 { font-size: 56px !important; }
+  h2 { font-size: 44px !important; }
+  .hero-live-line {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    min-height: 70px;
+  }
+}
+  
+/* ===============================
+   Final design touches
+   =============================== */
+
+/* visible, intentional hero motion */
+main > .container > section:first-child {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+main > .container > section:first-child::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  opacity: .36;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.045) 1px, transparent 1px),
+    linear-gradient(rgba(0,0,0,.032) 1px, transparent 1px),
+    linear-gradient(120deg, transparent 0 36%, rgba(83,111,232,.13) 36% 36.7%, transparent 36.7% 100%);
+  background-size: 44px 44px, 44px 44px, 100% 100%;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,.95), rgba(0,0,0,.12));
+  animation: heroGridDrift 22s linear infinite;
+}
+main > .container > section:first-child::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 20%, rgba(83,111,232,.12), transparent 28%),
+    radial-gradient(circle at 82% 16%, rgba(0,0,0,.08), transparent 24%);
+}
+@keyframes heroGridDrift {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to { background-position: 44px 18px, 0 44px, 0 0; }
+}
+
+/* better logo / nav tension */
+.logo-mark {
+  position: relative;
+}
+.logo-mark::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1.5px solid #fff;
+}
+.logo-word {
+  font-size: 31px !important;
+}
+.logo-sub {
+  margin-left: 1px;
+}
+.nav-links a:not(.nav-cta) {
+  position: relative;
+}
+.nav-links a:not(.nav-cta)::after {
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:-5px;
+  height:2px;
+  background: var(--blue-flat);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .16s ease;
+}
+.nav-links a:not(.nav-cta):hover::after {
+  transform: scaleX(1);
+}
+
+/* hero live card needs actual finishing */
+.hero-live {
+  margin-top: 22px;
+  width: min(620px, 100%);
+  border: 2px solid var(--line-heavy);
+  background: rgba(255,255,255,.88);
+  box-shadow: 10px 10px 0 rgba(0,0,0,.11);
+  backdrop-filter: blur(4px);
+}
+.hero-live-label {
+  padding: 10px 14px;
+  border-bottom: 2px solid var(--line-heavy);
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink-heavy);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.hero-live-label::after {
+  content:"LIVE";
+  color:#fff;
+  background:var(--blue-flat);
+  padding:3px 7px;
+  letter-spacing:.12em;
+}
+.hero-live-line {
+  min-height: 62px;
+  padding: 15px 16px;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--ink-heavy);
+}
+.hero-type-target {
+  font-weight: 700;
+  letter-spacing: -.01em;
+}
+.hero-cursor {
+  display:inline-block;
+  width:9px;
+  height:1.1em;
+  background:var(--blue-flat);
+  margin-left:3px;
+  transform:translateY(2px);
+  animation: cursorBlink .9s steps(1,end) infinite;
+}
+@keyframes cursorBlink {
+  0%,49% { opacity:1; }
+  50%,100% { opacity:0; }
+}
+
+/* reference card: make it feel like a tear sheet */
+.ref-card {
+  position: relative;
+  box-shadow: 14px 14px 0 rgba(0,0,0,.13) !important;
+}
+.ref-card::before {
+  content:"RETROSPECTIVE";
+  position:absolute;
+  top:-13px;
+  right:18px;
+  background:#f6f7f8;
+  padding:0 9px;
+  font-family:'JetBrains Mono', monospace;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.16em;
+}
+.ref-card::after {
+  content:"";
+  position:absolute;
+  left:24px;
+  right:24px;
+  bottom:18px;
+  height:2px;
+  background:var(--blue-flat);
+  opacity:.85;
+}
+
+/* example chips should look like product controls, not tags */
+.example-row {
+  padding: 10px;
+  border: 1.5px solid var(--line-heavy);
+  background: #f3f4f6;
+}
+.example-btn {
+  border-radius: 0 !important;
+  border: 1.5px solid var(--line-heavy) !important;
+  background: #fff !important;
+  color: var(--ink-heavy);
+  box-shadow: 3px 3px 0 rgba(0,0,0,.12);
+}
+.example-btn:hover,
+.example-btn.active {
+  background: var(--blue-flat) !important;
+  color: #fff;
+  transform: translate(-1px,-1px);
+  box-shadow: 4px 4px 0 rgba(0,0,0,.18);
+}
+
+/* desk sections need stronger internal hierarchy */
+.field {
+  position: relative;
+}
+.field > label {
+  margin-bottom: 12px !important;
+}
+.buyer-list {
+  display:grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
+  gap: 14px !important;
+}
+.buyer-card {
+  min-height: 174px;
+}
+.buyer-card .buyer-name input {
+  font-weight: 700;
+  font-size: 13px;
+}
+.buyer-card textarea {
+  min-height: 78px;
+}
+
+/* report output: make generated brief feel more serious */
+.brief-output {
+  margin-top: 54px !important;
+}
+.brief-doc {
+  box-shadow: 16px 16px 0 rgba(0,0,0,.12) !important;
+}
+.brief-header {
+  letter-spacing: -.02em;
+}
+.brief-section::before {
+  content:"";
+  display:block;
+  width: 48px;
+  height: 2px;
+  background: var(--line-heavy);
+  margin-bottom: 18px;
+}
+.rank-row {
+  gap: 20px;
+}
+.rank-name {
+  max-width: 78%;
+}
+.rank-score {
+  font-weight: 700;
+}
+.rank-item.lead {
+  padding: 10px 12px 12px;
+  margin-left: -12px;
+  margin-right: -12px;
+  background: #f1f2f4;
+  border-left: 6px solid var(--line-heavy);
+}
+.rank-item.lead .bar-fill {
+  background: var(--blue-flat) !important;
+}
+.bar-bg {
+  height: 8px !important;
+}
+
+/* proof chart and pricing need institutional mass */
+#proofChart {
+  padding: 26px !important;
+}
+.price-card {
+  min-height: 300px;
+}
+.price-card .mini-btn.solid,
+.nav-cta {
+  transition: transform .14s ease, box-shadow .14s ease;
+}
+.price-card .mini-btn.solid:hover,
+.nav-cta:hover {
+  transform: translate(-1px,-1px);
+  box-shadow: 5px 5px 0 var(--blue-flat);
+}
+
+/* remove remaining soft pill feeling where it cheapens the surface */
+.nav-cta,
+.mini-btn,
+.run-btn,
+.lens-btn,
+.badge,
+.seg-toggle,
+.seg-toggle button,
+textarea,
+input,
+select,
+.price-card,
+.tool-card,
+.brief-doc,
+.ref-card {
+  border-radius: 0 !important;
+}
+
+/* motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  main > .container > section:first-child::before,
+  .hero-cursor {
+    animation: none !important;
+  }
+}
+
+
+.hero-proof-rail {
+  display:flex;
+  gap:0;
+  flex-wrap:wrap;
+  margin-top: 14px;
+  width: min(620px, 100%);
+  border: 1.5px solid var(--line-heavy);
+  background:#fff;
+}
+.hero-proof-rail span {
+  flex:1;
+  min-width:150px;
+  padding: 10px 12px;
+  border-right: 1.5px solid var(--line-heavy);
+  font-family:'JetBrains Mono', monospace;
+  font-size:10px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:#444;
+}
+.hero-proof-rail span:last-child {
+  border-right:0;
+}
+
+
+/* non-disruptive preset feedback */
+.example-btn.active {
+  position: relative;
+}
+.example-btn.active::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -6px;
+  height: 2px;
+  background: var(--ink-heavy);
+}
+#cimStatus {
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #555;
+}
+
+
+/* Cooley red pass — true red / cool white */
+.hero-live-label::after {
+  background: var(--blue-flat) !important;
+}
+.rank-item.lead .bar-fill {
+  background: var(--blue-flat) !important;
+}
+.nav-cta, .price-card .mini-btn.solid:hover, .nav-cta:hover {
+  box-shadow: 5px 5px 0 var(--blue-flat);
+}
+
+
+/* ===============================
+   TRUE RED / COOL WHITE OVERRIDE
+   =============================== */
+:root {
+  --ink-heavy:#08090b !important;
+  --ink-soft:#20242a !important;
+  --paper-heavy:#f6f7f8 !important;
+  --sheet-heavy:#ffffff !important;
+  --line-heavy:#08090b !important;
+  --line-soft:#cfd3da !important;
+  --blue-flat:#D71920 !important;
+}
+body {
+  background:#f6f7f8 !important;
+  color:#08090b !important;
+}
+body::before {
+  background:
+    linear-gradient(90deg, rgba(8,9,11,.028) 1px, transparent 1px),
+    linear-gradient(rgba(8,9,11,.020) 1px, transparent 1px) !important;
+  background-size: 48px 48px !important;
+  opacity:.42 !important;
+}
+.navbar {
+  background: rgba(247,248,250,.96) !important;
+}
+main > .container > section:first-child::before {
+  opacity:.48 !important;
+  background:
+    linear-gradient(90deg, rgba(8,9,11,.05) 1px, transparent 1px),
+    linear-gradient(rgba(8,9,11,.035) 1px, transparent 1px),
+    linear-gradient(118deg, transparent 0 33%, rgba(215,25,32,.24) 33% 33.7%, transparent 33.7% 100%) !important;
+  background-size: 44px 44px, 44px 44px, 100% 100% !important;
+}
+main > .container > section:first-child::after {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(215,25,32,.18), transparent 28%),
+    radial-gradient(circle at 82% 16%, rgba(8,9,11,.08), transparent 25%) !important;
+}
+.logo-mark {
+  background:#08090b !important;
+  box-shadow: 5px 5px 0 #D71920 !important;
+}
+.logo-word,
+.logo-sub,
+.eyebrow,
+.nav-links a {
+  color:#08090b !important;
+}
+.nav-cta,
+.run-btn,
+.seg-toggle button.on,
+.example-btn:hover,
+.example-btn.active,
+.hero-live-label::after {
+  background:#D71920 !important;
+  border-color:#D71920 !important;
+  color:#fff !important;
+}
+.nav-cta,
+.run-btn {
+  box-shadow: 7px 7px 0 #08090b !important;
+}
+.nav-cta:hover,
+.run-btn:hover:not(:disabled) {
+  box-shadow: 10px 10px 0 #08090b !important;
+}
+.hero-live {
+  background: rgba(255,255,255,.92) !important;
+}
+.hero-cursor,
+.ref-card::after,
+.nav-links a:not(.nav-cta)::after,
+.example-btn.active::after {
+  background:#D71920 !important;
+}
+.hero-proof-rail,
+.ref-card,
+.tool-card,
+.brief-doc,
+.price-grid,
+#proofChart {
+  background:#fff !important;
+}
+.privacy-note {
+  background:#fff !important;
+  border-left-color:#D71920 !important;
+}
+.brief-header {
+  background:#08090b !important;
+  color:#fff !important;
+}
+.rank-item.lead {
+  background:#f0f1f4 !important;
+  border-left-color:#D71920 !important;
+}
+.rank-item.lead .bar-fill {
+  background:#D71920 !important;
+}
+.recommendation {
+  background:#f3f4f6 !important;
+}
+.example-row {
+  background:#f3f4f6 !important;
+}
+.price-card .mini-btn.solid:hover,
+.nav-cta:hover {
+  box-shadow: 5px 5px 0 #D71920 !important;
+}
+
+
+.ref-kicker {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  width:max-content;
+  font-family:'JetBrains Mono', monospace;
+  font-size:10px;
+  letter-spacing:.16em;
+  font-weight:700;
+  color:#D71920;
+  border:1.5px solid #D71920;
+  padding:5px 8px;
+}
+.ref-kicker::before {
+  content:"";
+  width:7px;
+  height:7px;
+  background:#D71920;
+}
+
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <div class="container nav-inner">
+    <div class="logo">
+      <div class="logo-mark"></div>
+      <div class="logo-lockup">
+        <div class="logo-word">Deal Desk</div>
+        <div class="logo-sub">ARBITER</div>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="#how">Method</a>
+      <a href="#desk">Run</a>
+      <a href="#proof">Proof</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#desk" class="nav-cta">Open the desk</a>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="container">
+    <!-- hero section (unchanged) -->
+    <section style="border-bottom: none;">
+      <div class="eyebrow">arbiter coherence engine · deterministic · private compute</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start;">
+        <div>
+          <h1>Buyer conviction <span style="font-style: italic;">before</span> the first call.</h1>
+          <p style="font-size: 18px; margin-top: 16px; color: #30343b; max-width: 480px;">Deterministic coherence scoring for acquirer fit, narrative pressure, and process framing. Built to sharpen buyer prioritization before outreach begins.</p>
+          <div class="hero-live" aria-live="polite">
+            <div class="hero-live-label">Deal signal</div>
+            <div class="hero-live-line">
+              <span id="heroTypeTarget" class="hero-type-target"></span><span class="hero-cursor"></span>
+            </div>
+          </div>
+          <div class="hero-proof-rail">
+            <span>26MB engine</span>
+            <span>deterministic</span>
+            <span>private compute</span>
+          </div>
+          <button class="run-btn" onclick="document.getElementById('desk').scrollIntoView({behavior:'smooth'})">Generate positioning brief</button>
+        </div>
+        <div class="ref-card">
+          <div class="ref-kicker">REFERENCE TRANSACTION</div>
+          <div style="font-size: 32px; font-weight: 600; margin: 12px 0 8px;">Ventyx Biosciences → Eli Lilly</div>
+          <div style="font-size: 14px; color: #30343b;">Public data only · before announcement</div>
+          <div class="ref-stats">
+            <div class="stat"><div class="stat-number">#1/7</div><div class="stat-label">eventual acquirer ranked first</div></div>
+            <div class="stat"><div class="stat-number">0.87</div><div class="stat-label">winning buyer coherence</div></div>
+            <div class="stat"><div class="stat-number">90s</div><div class="stat-label">five‑pass memo</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="eyebrow">five passes</div>
+      <h2>From buyer list to lead structure.</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 32px; margin-top: 32px;">
+        <div><div style="font-weight: 700;">01</div><div style="font-weight: 600;">Rank buyers</div><div style="font-size: 14px;">Strategic fit first pass.</div></div>
+        <div><div style="font-weight: 700;">02</div><div style="font-weight: 600;">Apply financial lens</div><div style="font-size: 14px;">Survivors become short list.</div></div>
+        <div><div style="font-weight: 700;">03</div><div style="font-weight: 600;">Rank narratives</div><div style="font-size: 14px;">Find the story that sticks.</div></div>
+        <div><div style="font-weight: 700;">04</div><div style="font-weight: 600;">Watch the flip</div><div style="font-size: 14px;">Where lead story changes, pitch changes.</div></div>
+        <div><div style="font-weight: 700;">05</div><div style="font-weight: 600;">Assemble structure</div><div style="font-size: 14px;">Buyer + narrative pairing.</div></div>
+      </div>
+    </section>
+
+    <section id="desk">
+      <div class="eyebrow">the desk</div>
+      <h2>Run your asset.</h2>
+      <div class="tool-card" style="margin-top: 32px;">
+        <div class="tool-header">
+          <span class="badge">LIVE · ARBITER</span>
+          <div class="seg-toggle" id="computeToggle">
+            <button data-mode="public" class="on">Public API</button>
+            <button data-mode="local">Local (air‑gap)</button>
+          </div>
+        </div>
+        <div class="tool-body">
+          <div id="privacyMsg" class="privacy-note">PUBLIC COMPUTE — text is sent to api.arbiter.traut.ai. For confidential mandates, switch to Local.</div>
+          <input type="text" id="localEndpoint" placeholder="http://localhost:8000/v1/compare" style="display: none; margin-bottom: 16px;">
+          
+          <div class="field">
+            <label>Asset profile</label>
+            <div class="example-row">
+              <span class="example-btn" data-example="biotech">Biotech · NLRP3</span>
+              <span class="example-btn" data-example="saas">B2B SaaS · Fintech</span>
+              <span class="example-btn" data-example="medtech">Medtech · Cardiac</span>
+            </div>
+            <div class="toolbar-row">
+              <button class="mini-btn" id="uploadCimBtn">Upload CIM / PDF</button>
+              <span id="cimStatus" style="font-size: 11px;"></span>
+              <input type="file" id="cimFile" accept=".pdf,.txt" style="display: none;">
+            </div>
+            <textarea id="assetProfile" rows="4">Clinical-stage biopharmaceutical company in San Diego. Lead programs are NLRP3 inflammasome inhibitors, one biological pathway implicated across cardiometabolic, neurodegenerative, and autoimmune conditions. Oral small molecules. No approved products and no product revenue. Lead asset in mid-stage trials.</textarea>
+          </div>
+
+          <div class="field">
+            <label>Buyer universe</label>
+            <div class="toolbar-row">
+              <select id="savedUniSelect"><option value="">— saved universes —</option></select>
+              <input type="text" id="uniName" placeholder="name this universe" style="width: auto; flex:1;">
+              <button class="mini-btn" id="saveUniBtn">Save</button>
+              <button class="mini-btn" id="delUniBtn">Delete</button>
+            </div>
+            <div id="buyerListContainer" class="buyer-list"></div>
+            <button class="mini-btn add-buyer-btn" id="addBuyerBtn">+ Add buyer</button>
+          </div>
+
+          <details style="margin-bottom: 24px;">
+            <summary style="font-size: 13px; font-weight: 600; cursor: pointer;">Advanced: lenses, narratives, white-label</summary>
+            <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+              <div><label>Strategic lens</label><textarea id="lensS" rows="3">As an acquirer that pays up for science years before any revenue, concentrating capital where one discovery could open several large markets at once, and willing to absorb early losses for a distant payoff.</textarea></div>
+              <div><label>Financial lens</label><textarea id="lensF" rows="3">As an acquirer that buys businesses already generating predictable cash, funds the purchase with borrowed money, cuts cost to widen margin, and needs a clean exit within five years.</textarea></div>
+              <div><label>Narratives (one per line)</label><textarea id="narratives" rows="4"></textarea></div>
+              <div><label>Buyer × Narrative combos</label><textarea id="combos" rows="4"></textarea></div>
+            </div>
+            <div style="display: flex; gap: 20px; margin-top: 20px;">
+              <div style="flex:1"><label>Firm name (white‑label)</label><input id="firmName" placeholder="Chen Advisory"></div>
+              <div style="flex:1"><label>Logo (optional)</label><button class="mini-btn" id="uploadLogoBtn">Upload image</button><input type="file" id="logoFile" accept="image/*" style="display: none;"></div>
+            </div>
+          </details>
+
+          <button class="run-btn" id="runDealBtn">Generate positioning brief</button>
+        </div>
+      </div>
+      <div id="briefContainer" class="brief-output"></div>
+    </section>
+
+    <section id="proof">
+      <div class="eyebrow">retrospective validation</div>
+      <h2>Ventyx Biosciences → Eli Lilly</h2>
+      <div class="proof-grid" style="margin-top: 32px;">
+        <div>
+          <div class="proof-list">
+            <div class="proof-item"><strong>Strategic lens</strong><span>Lilly 0.8721, Novartis 0.8160, BMS 0.7951</span></div>
+            <div class="proof-item"><strong>Financial lens</strong><span>Lilly still #1 (0.8197), margin compressing to AbbVie</span></div>
+            <div class="proof-item"><strong>Without buyer keywords</strong><span>Lilly lead widened, Pfizer dropped to 6th</span></div>
+          </div>
+          <p class="privacy-note" style="margin-top: 20px;">Verified: buyer identification. Narrative passes are decision support, not investment advice.</p>
+        </div>
+        <div id="proofChart" style="background: #ffffff; border-radius: 24px; padding: 20px;"></div>
+      </div>
+    </section>
+
+    <section id="pricing">
+      <div class="eyebrow">engagement</div>
+      <h2>Priced for active mandates.</h2>
+      <div class="price-grid" style="margin-top: 32px;">
+        <div class="price-card">
+          <div class="eyebrow">single mandate</div>
+          <div class="price-amount">$499</div>
+          <div style="margin: 20px 0;">One asset, full five‑pass brief: ranked buyer short list, strategic/financial lenses, positioning matrix, recommended structure, white‑label export.</div>
+          <button class="mini-btn solid" onclick="document.getElementById('desk').scrollIntoView()">Run a live brief</button>
+        </div>
+        <div class="price-card">
+          <div class="eyebrow">desk access</div>
+          <div class="price-amount">$1,500<span style="font-size: 20px;">/mo</span></div>
+          <div style="margin: 20px 0;">Unlimited briefs for active advisors. Saved buyer universes, white‑label PDF, local compute for confidential mandates.</div>
+          <a href="mailto:joel.d.trout.two@gmail.com?subject=Deal%20Desk%20subscription" class="mini-btn solid" style="display: inline-block; text-decoration: none;">Request desk access →</a>
+        </div>
+      </div>
+    </section>
+  </div>
+  <footer>
+    <div class="container">
+      Actual General Intelligence Inc. · La Jolla, CA · ARBITER deterministic coherence engine (26MB, CPU‑only)<br>
+      Decision support only. Not investment advice or a solicitation.
+    </div>
+  </footer>
+</main>
+
+<script>
+  const PUBLIC_API = "https://api.arbiter.traut.ai/public/compare";
+  let computeMode = "public";
+  let customLogo = null;
+  let buyers = [];
+
+  const assetProfile = document.getElementById('assetProfile');
+  const lensS = document.getElementById('lensS');
+  const lensF = document.getElementById('lensF');
+  const narratives = document.getElementById('narratives');
+  const combos = document.getElementById('combos');
+  const briefContainer = document.getElementById('briefContainer');
+  const runBtn = document.getElementById('runDealBtn');
+  const computeToggle = document.getElementById('computeToggle');
+  const privacyMsg = document.getElementById('privacyMsg');
+  const localEndpointInput = document.getElementById('localEndpoint');
+  const buyerContainer = document.getElementById('buyerListContainer');
+  const addBuyerBtn = document.getElementById('addBuyerBtn');
+  const savedUniSelect = document.getElementById('savedUniSelect');
+  const uniNameInput = document.getElementById('uniName');
+  const saveUniBtn = document.getElementById('saveUniBtn');
+  const delUniBtn = document.getElementById('delUniBtn');
+  const uploadCimBtn = document.getElementById('uploadCimBtn');
+  const cimFile = document.getElementById('cimFile');
+  const cimStatus = document.getElementById('cimStatus');
+  const uploadLogoBtn = document.getElementById('uploadLogoBtn');
+  const logoFile = document.getElementById('logoFile');
+
+  // ----- Pre‑defined buyer universes & narratives & combos -----
+  const defaultBuyers = [
+    { name: 'Eli Lilly', strategy: 'spends heavily on early-stage science when a single biological insight could reach several big markets, comfortable committing before revenue exists, deep cash reserves, recent run of pre-commercial acquisitions.' },
+    { name: 'AbbVie', strategy: 'defends a maturing immune-disease cash engine now facing generic competition, buys novel approaches that protect that installed base.' },
+    { name: 'Pfizer', strategy: 'facing a wall of expiring patents, prefers finished low-risk products that sell soon to replace lost top-line.' },
+    { name: 'Bristol Myers Squibb', strategy: 'rebuilding after major losses of exclusivity, selective, takes on novelty only when the science is clearly differentiated.' },
+    { name: 'Novartis', strategy: 'disciplined on price, concentrates on heart and immune programs, favors proven technology over early bets.' },
+    { name: 'Amgen', strategy: 'large-molecule manufacturer wary of early chemistry programs, wants assets that scale through existing plants.' },
+    { name: 'Private equity sponsor', strategy: 'buys businesses that already throw off cash, funds with borrowed money, trims overhead to widen margin, sells within a handful of years, avoids unproven research.' }
+  ];
+
+  const saasBuyers = [
+    { name: 'Stripe', strategy: 'embeds financial services into software platforms; has acquired infrastructure‑first fintech companies to expand its payments and lending stack.' },
+    { name: 'Shopify', strategy: 'builds commerce platform for merchants; heavily invested in delivering financial products (Shopify Payments, Capital) to increase merchant retention and ARPU.' },
+    { name: 'Adyen', strategy: 'global payments processor with a focus on unified commerce; looks for technology that deepens its platform capabilities, especially in embedded finance.' },
+    { name: 'Fiserv', strategy: 'large‑scale financial technology provider serving banks and merchants; acquisitive in the B2B SaaS and payments orchestration space.' },
+    { name: 'Marqeta', strategy: 'modern card issuing and core payment infrastructure; prefers early‑stage platform companies that can be integrated into its open API ecosystem.' },
+    { name: 'PE (software)', strategy: 'buys profitable or high‑growth vertical SaaS businesses, improves sales efficiency, and sells after 4‑6 years. Focuses on recurring revenue and low churn.' }
+  ];
+
+  const medtechBuyers = [
+    { name: 'Medtronic', strategy: 'largest pure‑play medtech; constantly seeks minimally invasive monitoring technologies that complement its cardiac, neurological, and surgical portfolios.' },
+    { name: 'Abbott', strategy: 'strong in continuous glucose monitoring and cardiac diagnostics; values non‑invasive sensors and remote patient monitoring platforms.' },
+    { name: 'Boston Scientific', strategy: 'focuses on electrophysiology, rhythm management, and interventional cardiology; prefers devices with strong clinical evidence and reimbursement pathway.' },
+    { name: 'GE Healthcare', strategy: 'invests heavily in digital and connected devices; looks for monitoring solutions that integrate with its imaging and clinical information systems.' },
+    { name: 'Philips', strategy: 'transitioning to health technology; acquires remote monitoring and home‑care devices that leverage its cloud and AI capabilities.' },
+    { name: 'Stryker', strategy: 'dominant in orthopaedics and surgical equipment; selectively buys monitoring and navigation technologies for operating rooms and post‑op care.' }
+  ];
+
+  // Example‑specific narratives (positioning statements) and combos (buyer + narrative pairs)
+  const exampleNarratives = {
+    biotech: `One early discovery that, if it holds up, becomes a string of separate products across unrelated large diseases over the next decade.
+A fresh way to hold onto an aging cash engine whose legal protection is about to lapse.
+A backfill for sales that vanish when today's top sellers lose their protection.
+Cheap entry into science that has already cleared its first hurdles, with the hard integration work deferred.
+Reduce the company to its single strongest program, cut the rest, widen margin, and sell it on.`,
+    saas: `A strategic platform extension that adds high‑margin financial services to an existing software ecosystem.
+Defensive acquisition to prevent a rival from owning the embedded finance layer in a key vertical.
+A roll‑up of complementary API infrastructure to accelerate time‑to‑market and cross‑sell.
+Financial sponsor play: buy, improve sales efficiency, and exit in 4‑6 years.
+A tuck‑in that fills a specific product gap (e.g., lending underwriting) without integration headaches.`,
+    medtech: `Adds a non‑invasive monitoring platform to a large cardiac portfolio, creating cross‑sell leverage.
+Defensive buy to block competitors from owning the outpatient remote monitoring space.
+Accelerates entry into a high‑growth adjacent market (e.g., heart failure management) with an FDA‑cleared device.
+A bolt‑on that leverages existing manufacturing and sales channels with minimal R&D risk.
+PE carve‑out: improve margins through supply chain consolidation and sell to a strategic later.`
+  };
+
+  const exampleCombos = {
+    biotech: `Eli Lilly treating the asset as one early discovery that could become many products across large diseases over a decade.
+AbbVie treating the asset as a way to defend an aging cash engine losing its protection.
+Pfizer treating the asset as a backfill for sales about to disappear.
+Bristol Myers Squibb treating the asset as cheap entry into science already past its first hurdles.
+Private equity sponsor treating the asset as something to strip to one program, widen margin, and sell on.`,
+    saas: `Stripe treating the asset as a strategic platform extension that adds high‑margin financial services to its existing ecosystem.
+Shopify treating the asset as a defensive acquisition to prevent a rival from owning the embedded finance layer.
+Fiserv treating the asset as a roll‑up of complementary API infrastructure to accelerate time‑to‑market.
+PE (software) treating the asset as a buy‑improve‑sell opportunity in the vertical SaaS space.
+Adyen treating the asset as a tuck‑in that fills a specific product gap without integration headaches.`,
+    medtech: `Medtronic treating the asset as a non‑invasive monitoring platform to cross‑sell into its cardiac and neurological portfolios.
+Boston Scientific treating the asset as a bolt‑on that leverages existing manufacturing and sales channels.
+Abbott treating the asset as a defensive buy to block competitors in outpatient remote monitoring.
+GE Healthcare treating the asset as an accelerator into heart failure management with an FDA‑cleared device.
+Stryker treating the asset as a technology add‑on for operating room navigation and post‑op care.`
+  };
+
+  const exampleProfiles = {
+    biotech: `CONFIDENTIAL INFORMATION MEMORANDUM
+NLRP3 THERAPEUTICS, INC.
+A clinical-stage biopharmaceutical company developing novel small molecule NLRP3 inflammasome inhibitors for cardiometabolic, neurodegenerative, and autoimmune diseases.
+
+HIGHLIGHTS:
+- Lead asset: NTI-01, an oral NLRP3 inhibitor in Phase 2a for chronic kidney disease with associated inflammation
+- Second asset: NTI-02, brain-penetrant NLRP3 inhibitor in Phase 1 for Parkinson's disease
+- Platform: Highly selective small molecules targeting the NLRP3 inflammasome pathway, implicated in over 50 inflammatory conditions
+- IP: Composition of matter patents expiring 2042-2044; formulation and method-of-use patents pending
+- Team: Founders from Salk Institute and UCSD; previously exited NLRP3 program to Novartis for $450M
+
+MARKET OPPORTUNITY:
+NLRP3 inflammasome is a validated target across multiple large indications: chronic kidney disease ($12B market), Parkinson's disease ($8B market), and atherosclerosis ($15B market). No approved NLRP3 inhibitors exist; current standard of care is broad immunosuppression or symptomatic treatment.
+
+FINANCIAL SUMMARY (FY2025):
+- Cash on hand: $78.4M
+- Burn rate: $4.2M/month
+- Runway: 18 months (into Q4 2026)
+- Cap table: Series B led by Arch Venture Partners (35%), OrbiMed (22%), founders (18%), others (25%)
+
+PIPELINE:
+NTI-01 (Phase 2a, CKD): Top-line data expected Q3 2026. Interim analysis shows 42% reduction in inflammatory biomarkers (IL-1β, IL-18) and stabilized eGFR in 78% of patients.
+NTI-02 (Phase 1, Parkinson's): SAD/PART completed; well-tolerated up to 600mg. Brain penetration confirmed via CSF sampling. Entering MAD cohort.
+
+RECENT DEVELOPMENTS:
+- January 2026: Announced positive 12-month follow-up data from NTI-01 Phase 2a open-label extension
+- March 2026: Received FDA Fast Track designation for NTI-01 in CKD
+
+OUTSTANDING DEBT:
+- Convertible notes: $22M due December 2027, convertible at $8.50/share
+
+USE OF PROCEEDS:
+This offering seeks to raise $120M Series C to fund Phase 2b/3 registration trials for NTI-01 in CKD, advance NTI-02 into Phase 2, and expand pipeline into additional NLRP3-driven indications.
+
+This document does not constitute an offer to sell securities. For qualified institutional investors only.`,
+
+    saas: `CONFIDENTIAL INFORMATION MEMORANDUM
+PAYFLOW FINANCIAL, INC.
+A B2B embedded finance platform enabling SaaS companies to offer payment processing, lending, and banking products to their small business customers without becoming a regulated financial institution.
+
+HIGHLIGHTS:
+- Platform: API-first infrastructure that integrates in <2 weeks; handles KYC, underwriting, and treasury management
+- Traction: 150+ B2B SaaS customers, 22,000 active merchants, $1.2B annualized payment volume (up 220% YoY)
+- Unit economics: Net revenue retention 118%, gross margin 68%, payback period 11 months
+- Team: Ex-Stripe, Adyen, and Plaid; founded by two repeat entrepreneurs
+
+MARKET OPPORTUNITY:
+The embedded finance market is projected to grow from $32B to $185B by 2030. SMB software providers increasingly need financial services to retain customers and increase ARPU, but most lack the compliance and capital infrastructure.
+
+FINANCIAL SUMMARY (FY2025):
+- Revenue: $38M (ARR), up 140% YoY
+- Gross profit: $25.8M
+- Operating expenses: $34M
+- Net loss: ($8.2M)
+- Cash on hand: $42M
+- Runway: 14 months
+
+CAP TABLE:
+Series B led by Andreessen Horowitz (32%), Tiger Global (28%), founders (20%), others (20%)
+
+RECENT DEVELOPMENTS:
+- February 2026: Launched embedded lending product with $50M credit facility from Silicon Valley Bank
+- April 2026: Signed partnership with Toast and Shopify as preferred payment processor for their integrated apps
+
+USE OF PROCEEDS:
+This offering seeks to raise $75M Series C to expand sales and marketing into Europe, double engineering headcount, and launch embedded insurance products.`,
+
+    medtech: `CONFIDENTIAL INFORMATION MEMORANDUM
+CARDIOSENSE, INC.
+A commercial-stage medical device company manufacturing a non‑invasive continuous cardiac output monitor for use in hospital and remote patient monitoring settings.
+
+HIGHLIGHTS:
+- Product: CardioPatch – a wearable chest sensor that tracks stroke volume, cardiac index, and fluid status via bioimpedance; cleared by FDA (2024) and CE mark (2025)
+- Sales: 4,500 units sold in 2025, generating $18M revenue (up 280% YoY)
+- Customers: 65 hospitals, 12 telehealth providers, 3 large accountable care organizations
+- Reimbursement: New CPT Category III code effective January 2026; LCD expected Q3 2026
+- Team: Ex‑Medtronic, Edwards Lifesciences, and Abbott
+
+MARKET OPPORTUNITY:
+The cardiac monitoring market is $22B and growing at 9% annually. Traditional invasive catheterization is expensive and risky; CardioPatch offers accurate, continuous, non‑invasive hemodynamic data for heart failure, sepsis, and post‑op monitoring.
+
+FINANCIAL SUMMARY (FY2025):
+- Revenue: $18M
+- COGS: $6.3M (35% margin)
+- Operating expenses: $19.5M (R&D $8.2M, SG&A $11.3M)
+- Net loss: ($7.8M)
+- Cash: $24M
+
+CAP TABLE:
+Series B led by OrbiMed (30%), Lightstone Ventures (22%), founders (15%), others (33%)
+
+RECENT DEVELOPMENTS:
+- January 2026: Published positive 500‑patient study showing 94% correlation with pulmonary artery catheter measurements
+- March 2026: Awarded group purchasing contract with Vizient
+
+USE OF PROCEEDS:
+This offering seeks to raise $50M Series C to scale manufacturing, build out direct sales force, and pursue label expansion into pediatric and maternal‑fetal monitoring.`
+  };
+
+  function setBuyerUniverse(newBuyers) {
+    buyers = newBuyers.map(b => ({ name: b.name, strategy: b.strategy }));
+    renderBuyers();
+  }
+
+  function loadExample(exampleKey) {
+    const profile = exampleProfiles[exampleKey];
+    if (profile) {
+      assetProfile.value = profile;
+      cimStatus.textContent = `example loaded · ${exampleKey}`;
+      // Load appropriate buyer universe
+      if (exampleKey === 'saas') {
+        setBuyerUniverse(saasBuyers);
+      } else if (exampleKey === 'medtech') {
+        setBuyerUniverse(medtechBuyers);
+      } else {
+        setBuyerUniverse(defaultBuyers);
+      }
+      // Load narratives and combos for this example
+      narratives.value = exampleNarratives[exampleKey];
+      combos.value = exampleCombos[exampleKey];
+      // Clear previous brief to avoid confusion
+      briefContainer.innerHTML = '';
+    }
+  }
+
+  document.querySelectorAll('.example-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.example-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const ex = btn.dataset.example;
+      loadExample(ex);
+    });
+  });
+
+  function getEndpoint() {
+    if (computeMode === 'public') return PUBLIC_API;
+    let url = localEndpointInput.value.trim();
+    if (!url) url = "http://localhost:8000/v1/compare";
+    return url;
+  }
+
+  computeToggle.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      computeToggle.querySelectorAll('button').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      computeMode = btn.dataset.mode;
+      if (computeMode === 'local') {
+        localEndpointInput.style.display = 'block';
+        privacyMsg.innerHTML = 'LOCAL COMPUTE — requests route to your on-prem ARBITER. Endpoint must return { all: [{text, score}] }.';
+        privacyMsg.style.background = "#f7f4f2";
+        privacyMsg.style.borderLeftColor = "#D71920";
+      } else {
+        localEndpointInput.style.display = 'none';
+        privacyMsg.innerHTML = 'PUBLIC COMPUTE — text is sent to api.arbiter.traut.ai. For confidential mandates, switch to Local.';
+        privacyMsg.style.background = "#f7f4f2";
+        privacyMsg.style.borderLeftColor = "#D71920";
+      }
+    });
+  });
+
+  function renderBuyers() {
+    buyerContainer.innerHTML = '';
+    buyers.forEach((buyer, idx) => {
+      const card = document.createElement('div');
+      card.className = 'buyer-card';
+      card.innerHTML = `
+        <div class="buyer-name">
+          <input type="text" placeholder="Buyer name (e.g., Eli Lilly)" value="${escapeHtml(buyer.name)}" data-idx="${idx}" data-field="name">
+        </div>
+        <textarea rows="2" placeholder="Describe the buyer's strategy..." data-idx="${idx}" data-field="strategy">${escapeHtml(buyer.strategy)}</textarea>
+        <div class="buyer-actions">
+          <button class="mini-btn remove-buyer" data-idx="${idx}">Remove</button>
+        </div>
+      `;
+      buyerContainer.appendChild(card);
+    });
+    document.querySelectorAll('.buyer-card input, .buyer-card textarea').forEach(el => {
+      el.addEventListener('change', (e) => {
+        const idx = parseInt(el.dataset.idx);
+        const field = el.dataset.field;
+        if (field === 'name') buyers[idx].name = el.value;
+        else buyers[idx].strategy = el.value;
+      });
+    });
+    document.querySelectorAll('.remove-buyer').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt(btn.dataset.idx);
+        buyers.splice(idx, 1);
+        renderBuyers();
+      });
+    });
+  }
+
+  addBuyerBtn.addEventListener('click', () => {
+    buyers.push({ name: '', strategy: '' });
+    renderBuyers();
+  });
+
+  function loadDefaultBuyers() {
+    buyers = defaultBuyers.map(b => ({ name: b.name, strategy: b.strategy }));
+    renderBuyers();
+  }
+  loadDefaultBuyers();
+
+  // Initialize narratives & combos with biotech defaults (the first example)
+  narratives.value = exampleNarratives.biotech;
+  combos.value = exampleCombos.biotech;
+
+  let savedUniverses = {};
+  function loadUniverses() { try { return JSON.parse(localStorage.getItem('dealdesk_uni') || '{}'); } catch(e) { return {}; } }
+  function saveUniverses(obj) { localStorage.setItem('dealdesk_uni', JSON.stringify(obj)); refreshUniSelect(); }
+  function refreshUniSelect() {
+    savedUniverses = loadUniverses();
+    savedUniSelect.innerHTML = '<option value="">— saved universes —</option>' + Object.keys(savedUniverses).map(k => `<option value="${k.replace(/"/g, '&quot;')}">${k}</option>`).join('');
+  }
+  saveUniBtn.addEventListener('click', () => {
+    const name = uniNameInput.value.trim();
+    if (!name) return;
+    const curr = loadUniverses();
+    curr[name] = buyers.map(b => ({ name: b.name, strategy: b.strategy }));
+    saveUniverses(curr);
+    uniNameInput.value = '';
+  });
+  delUniBtn.addEventListener('click', () => {
+    const name = savedUniSelect.value;
+    if (!name) return;
+    const curr = loadUniverses();
+    delete curr[name];
+    saveUniverses(curr);
+  });
+  savedUniSelect.addEventListener('change', () => {
+    const name = savedUniSelect.value;
+    if (name && savedUniverses[name]) {
+      buyers = savedUniverses[name].map(b => ({ name: b.name, strategy: b.strategy }));
+      renderBuyers();
+    }
+  });
+  refreshUniSelect();
+
+  uploadCimBtn.addEventListener('click', () => cimFile.click());
+  cimFile.addEventListener('change', async (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    cimStatus.textContent = 'loading...';
+    try {
+      let text = '';
+      if (f.name.endsWith('.pdf')) {
+        const buf = await f.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+        let full = '';
+        for (let i = 1; i <= Math.min(pdf.numPages, 20); i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          full += content.items.map(it => it.str).join(' ') + '\n';
+        }
+        text = full;
+      } else {
+        text = await f.text();
+      }
+      text = text.replace(/\s+/g, ' ').trim();
+      assetProfile.value = text.slice(0, 2400);
+      cimStatus.textContent = `loaded ${text.length} chars` + (text.length > 2400 ? ' (trimmed)' : '');
+    } catch (err) {
+      cimStatus.textContent = 'error: ' + err.message;
+    }
+  });
+
+  uploadLogoBtn.addEventListener('click', () => logoFile.click());
+  logoFile.addEventListener('change', (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => { customLogo = ev.target.result; uploadLogoBtn.textContent = 'logo set'; };
+    reader.readAsDataURL(f);
+  });
+
+  async function compare(query, candidates) {
+    const res = await fetch(getEndpoint(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, candidates })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const arr = data.all || data.top || [];
+    return arr.sort((a,b) => (b.score||0) - (a.score||0));
+  }
+
+  function renderRankList(ranked, containerId, maxScore) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const listDiv = document.createElement('div');
+    listDiv.className = 'rank-list';
+    ranked.forEach((item, idx) => {
+      const isLead = idx === 0;
+      const localMax = Math.max(...ranked.map(r => r.score || 0), 0.001);
+      const percent = localMax > 0 ? (item.score / localMax) * 100 : 0;
+      const div = document.createElement('div');
+      div.className = `rank-item ${isLead ? 'lead' : ''}`;
+      div.innerHTML = `
+        <div class="rank-row">
+          <span class="rank-name">${escapeHtml(item.text.split(':')[0].slice(0, 80))}</span>
+          <span class="rank-score">${item.score.toFixed(4)}</span>
+        </div>
+        <div class="bar-bg"><div class="bar-fill" style="width: ${percent}%;"></div></div>
+      `;
+      listDiv.appendChild(div);
+    });
+    container.innerHTML = '';
+    container.appendChild(listDiv);
+  }
+
+  function escapeHtml(str) { return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+
+  async function runDeal() {
+    runBtn.disabled = true;
+    runBtn.textContent = 'Running ARBITER passes...';
+    briefContainer.innerHTML = '<div class="brief-doc" style="padding: 40px; text-align: center;">Running ARBITER coherence passes...</div>';
+
+    const asset = assetProfile.value.trim();
+    const buyerTexts = buyers.map(b => `${b.name}: ${b.strategy}`);
+    const narrs = narratives.value.split('\n').filter(l => l.trim());
+    const combosArr = combos.value.split('\n').filter(l => l.trim());
+
+    const queryS = lensS.value.trim() + ' ' + asset;
+    const queryF = lensF.value.trim() + ' ' + asset;
+
+    try {
+      const [buyerS, buyerF, narrS, narrF, comboRes] = await Promise.all([
+        compare(queryS, buyerTexts),
+        compare(queryF, buyerTexts),
+        compare(queryS, narrs),
+        compare(queryF, narrs),
+        compare(queryS, combosArr)
+      ]);
+      const maxBuyer = Math.max(...buyerS.map(b=>b.score), ...buyerF.map(b=>b.score), 0.001);
+      const maxNarr = Math.max(...narrS.map(n=>n.score), ...narrF.map(n=>n.score), 0.001);
+      const flip = (narrS[0]?.text !== narrF[0]?.text);
+      const assetName = asset.split('.')[0].slice(0, 70);
+      const briefHtml = `
+        <div class="brief-doc">
+          <div class="brief-header">
+            <span class="brief-title">${escapeHtml(assetName)}</span>
+            <button id="exportBriefBtn" class="mini-btn solid">Export PDF</button>
+          </div>
+          <div class="brief-section">
+            <div class="lens-row">
+              <button class="lens-btn active" data-lens="s" data-type="buyer">Strategic</button>
+              <button class="lens-btn" data-lens="f" data-type="buyer">Financial</button>
+            </div>
+            <div id="buyerRankContainer"></div>
+          </div>
+          <div class="brief-section">
+            <div class="lens-row">
+              <button class="lens-btn active" data-lens="s" data-type="narr">Strategic</button>
+              <button class="lens-btn" data-lens="f" data-type="narr">Financial</button>
+            </div>
+            <div id="narrRankContainer"></div>
+            ${flip ? `<p style="font-size:13px; margin-top:12px;">Lead narrative shift: “${escapeHtml(narrS[0]?.text.slice(0,80))}” → “${escapeHtml(narrF[0]?.text.slice(0,80))}”</p>` : ''}
+          </div>
+          <div class="brief-section">
+            <div class="recommendation">
+              <div class="reco-score">${comboRes[0]?.score.toFixed(3)}</div>
+              <div style="font-weight:600; margin-top:8px;">${escapeHtml(comboRes[0]?.text.split(':')[0])}</div>
+              <div style="font-size:13px; margin-top:8px;">Next: ${escapeHtml(comboRes[1]?.text.split(':')[0])} (${comboRes[1]?.score.toFixed(3)})</div>
+            </div>
+          </div>
+        </div>
+      `;
+      briefContainer.innerHTML = briefHtml;
+      window.briefData = { buyerS, buyerF, narrS, narrF, maxBuyer, maxNarr };
+      renderRankList(buyerS, 'buyerRankContainer', maxBuyer);
+      renderRankList(narrS, 'narrRankContainer', maxNarr);
+      document.querySelectorAll('.lens-btn[data-type="buyer"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const lens = btn.dataset.lens;
+          document.querySelectorAll('.lens-btn[data-type="buyer"]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const ranked = lens === 's' ? window.briefData.buyerS : window.briefData.buyerF;
+          renderRankList(ranked, 'buyerRankContainer', window.briefData.maxBuyer);
+        });
+      });
+      document.querySelectorAll('.lens-btn[data-type="narr"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const lens = btn.dataset.lens;
+          document.querySelectorAll('.lens-btn[data-type="narr"]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const ranked = lens === 's' ? window.briefData.narrS : window.briefData.narrF;
+          renderRankList(ranked, 'narrRankContainer', window.briefData.maxNarr);
+        });
+      });
+      document.getElementById('exportBriefBtn')?.addEventListener('click', () => {
+        const printWin = window.open('', '_blank');
+        printWin.document.write(`
+          <html><head><title>Deal Desk Brief</title><link href="https://fonts.googleapis.com/css2?family=Inter&family=Instrument+Serif&display=swap" rel="stylesheet">
+          <style>body{font-family:Inter,sans-serif;padding:40px;max-width:900px;margin:0 auto;}
+/* ===============================
+   Final design touches
+   =============================== */
+
+/* visible, intentional hero motion */
+main > .container > section:first-child {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+main > .container > section:first-child::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  opacity: .36;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.045) 1px, transparent 1px),
+    linear-gradient(rgba(0,0,0,.032) 1px, transparent 1px),
+    linear-gradient(120deg, transparent 0 36%, rgba(83,111,232,.13) 36% 36.7%, transparent 36.7% 100%);
+  background-size: 44px 44px, 44px 44px, 100% 100%;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,.95), rgba(0,0,0,.12));
+  animation: heroGridDrift 22s linear infinite;
+}
+main > .container > section:first-child::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 20%, rgba(83,111,232,.12), transparent 28%),
+    radial-gradient(circle at 82% 16%, rgba(0,0,0,.08), transparent 24%);
+}
+@keyframes heroGridDrift {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to { background-position: 44px 18px, 0 44px, 0 0; }
+}
+
+/* better logo / nav tension */
+.logo-mark {
+  position: relative;
+}
+.logo-mark::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1.5px solid #fff;
+}
+.logo-word {
+  font-size: 31px !important;
+}
+.logo-sub {
+  margin-left: 1px;
+}
+.nav-links a:not(.nav-cta) {
+  position: relative;
+}
+.nav-links a:not(.nav-cta)::after {
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:-5px;
+  height:2px;
+  background: var(--blue-flat);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .16s ease;
+}
+.nav-links a:not(.nav-cta):hover::after {
+  transform: scaleX(1);
+}
+
+/* hero live card needs actual finishing */
+.hero-live {
+  margin-top: 22px;
+  width: min(620px, 100%);
+  border: 2px solid var(--line-heavy);
+  background: rgba(255,255,255,.88);
+  box-shadow: 10px 10px 0 rgba(0,0,0,.11);
+  backdrop-filter: blur(4px);
+}
+.hero-live-label {
+  padding: 10px 14px;
+  border-bottom: 2px solid var(--line-heavy);
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink-heavy);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.hero-live-label::after {
+  content:"LIVE";
+  color:#fff;
+  background:var(--blue-flat);
+  padding:3px 7px;
+  letter-spacing:.12em;
+}
+.hero-live-line {
+  min-height: 62px;
+  padding: 15px 16px;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--ink-heavy);
+}
+.hero-type-target {
+  font-weight: 700;
+  letter-spacing: -.01em;
+}
+.hero-cursor {
+  display:inline-block;
+  width:9px;
+  height:1.1em;
+  background:var(--blue-flat);
+  margin-left:3px;
+  transform:translateY(2px);
+  animation: cursorBlink .9s steps(1,end) infinite;
+}
+@keyframes cursorBlink {
+  0%,49% { opacity:1; }
+  50%,100% { opacity:0; }
+}
+
+/* reference card: make it feel like a tear sheet */
+.ref-card {
+  position: relative;
+  box-shadow: 14px 14px 0 rgba(0,0,0,.13) !important;
+}
+.ref-card::before {
+  content:"RETROSPECTIVE";
+  position:absolute;
+  top:-13px;
+  right:18px;
+  background:#f6f7f8;
+  padding:0 9px;
+  font-family:'JetBrains Mono', monospace;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.16em;
+}
+.ref-card::after {
+  content:"";
+  position:absolute;
+  left:24px;
+  right:24px;
+  bottom:18px;
+  height:2px;
+  background:var(--blue-flat);
+  opacity:.85;
+}
+
+/* example chips should look like product controls, not tags */
+.example-row {
+  padding: 10px;
+  border: 1.5px solid var(--line-heavy);
+  background: #f3f4f6;
+}
+.example-btn {
+  border-radius: 0 !important;
+  border: 1.5px solid var(--line-heavy) !important;
+  background: #fff !important;
+  color: var(--ink-heavy);
+  box-shadow: 3px 3px 0 rgba(0,0,0,.12);
+}
+.example-btn:hover,
+.example-btn.active {
+  background: var(--blue-flat) !important;
+  color: #fff;
+  transform: translate(-1px,-1px);
+  box-shadow: 4px 4px 0 rgba(0,0,0,.18);
+}
+
+/* desk sections need stronger internal hierarchy */
+.field {
+  position: relative;
+}
+.field > label {
+  margin-bottom: 12px !important;
+}
+.buyer-list {
+  display:grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
+  gap: 14px !important;
+}
+.buyer-card {
+  min-height: 174px;
+}
+.buyer-card .buyer-name input {
+  font-weight: 700;
+  font-size: 13px;
+}
+.buyer-card textarea {
+  min-height: 78px;
+}
+
+/* report output: make generated brief feel more serious */
+.brief-output {
+  margin-top: 54px !important;
+}
+.brief-doc {
+  box-shadow: 16px 16px 0 rgba(0,0,0,.12) !important;
+}
+.brief-header {
+  letter-spacing: -.02em;
+}
+.brief-section::before {
+  content:"";
+  display:block;
+  width: 48px;
+  height: 2px;
+  background: var(--line-heavy);
+  margin-bottom: 18px;
+}
+.rank-row {
+  gap: 20px;
+}
+.rank-name {
+  max-width: 78%;
+}
+.rank-score {
+  font-weight: 700;
+}
+.rank-item.lead {
+  padding: 10px 12px 12px;
+  margin-left: -12px;
+  margin-right: -12px;
+  background: #f1f2f4;
+  border-left: 6px solid var(--line-heavy);
+}
+.rank-item.lead .bar-fill {
+  background: var(--blue-flat) !important;
+}
+.bar-bg {
+  height: 8px !important;
+}
+
+/* proof chart and pricing need institutional mass */
+#proofChart {
+  padding: 26px !important;
+}
+.price-card {
+  min-height: 300px;
+}
+.price-card .mini-btn.solid,
+.nav-cta {
+  transition: transform .14s ease, box-shadow .14s ease;
+}
+.price-card .mini-btn.solid:hover,
+.nav-cta:hover {
+  transform: translate(-1px,-1px);
+  box-shadow: 5px 5px 0 var(--blue-flat);
+}
+
+/* remove remaining soft pill feeling where it cheapens the surface */
+.nav-cta,
+.mini-btn,
+.run-btn,
+.lens-btn,
+.badge,
+.seg-toggle,
+.seg-toggle button,
+textarea,
+input,
+select,
+.price-card,
+.tool-card,
+.brief-doc,
+.ref-card {
+  border-radius: 0 !important;
+}
+
+/* motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  main > .container > section:first-child::before,
+  .hero-cursor {
+    animation: none !important;
+  }
+}
+
+
+.hero-proof-rail {
+  display:flex;
+  gap:0;
+  flex-wrap:wrap;
+  margin-top: 14px;
+  width: min(620px, 100%);
+  border: 1.5px solid var(--line-heavy);
+  background:#fff;
+}
+.hero-proof-rail span {
+  flex:1;
+  min-width:150px;
+  padding: 10px 12px;
+  border-right: 1.5px solid var(--line-heavy);
+  font-family:'JetBrains Mono', monospace;
+  font-size:10px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:#444;
+}
+.hero-proof-rail span:last-child {
+  border-right:0;
+}
+
+
+/* non-disruptive preset feedback */
+.example-btn.active {
+  position: relative;
+}
+.example-btn.active::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -6px;
+  height: 2px;
+  background: var(--ink-heavy);
+}
+#cimStatus {
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #555;
+}
+
+</style></head><body>
+          ${customLogo ? `<img src="${customLogo}" style="max-height:60px;">` : ''}
+          <h1 style="font-family:Instrument Serif;">${escapeHtml(assetName)}</h1>
+          <h3>Buyer short list (strategic)</h3><ul>${window.briefData.buyerS.map(b=>`<li><strong>${escapeHtml(b.text.split(':')[0])}</strong> — ${b.score.toFixed(4)}</li>`).join('')}</ul>
+          <h3>Lead narrative (strategic)</h3><p>${escapeHtml(window.briefData.narrS[0]?.text)}</p>
+          <p>Generated by ARBITER Deal Desk · ${new Date().toLocaleString()}</p>
+          </body></html>
+        `);
+        printWin.document.close();
+        printWin.print();
+      });
+    } catch (err) {
+      briefContainer.innerHTML = `<div class="brief-doc" style="padding: 32px; color: #b91c1c;">Error: ${err.message}<br>Check endpoint or network.</div>`;
+    } finally {
+      runBtn.disabled = false;
+      runBtn.textContent = 'Generate positioning brief';
+    }
+  }
+
+  runBtn.addEventListener('click', runDeal);
+
+  // Proof chart
+  const proofData = [["Eli Lilly",0.8721],["Novartis",0.8160],["Bristol Myers Squibb",0.7951],["AbbVie",0.7669],["Amgen",0.7574],["Pfizer",0.7399],["PE sponsor",0.7289]];
+  const maxProof = 0.8721;
+  const proofChart = document.getElementById('proofChart');
+  proofChart.innerHTML = '<div style="font-weight:500; margin-bottom:12px;">Buyer coherence · strategic lens</div>';
+  const plist = document.createElement('div'); plist.style.display = 'flex'; plist.style.flexDirection = 'column'; plist.style.gap = '12px';
+  proofData.forEach(([name, score]) => {
+    const percent = (score / maxProof) * 100;
+    plist.innerHTML += `<div><div style="display:flex; justify-content:space-between;"><span>${name}</span><span style="font-family:monospace;">${score.toFixed(4)}</span></div><div style="background:#d9dce2; border-radius:20px; height:6px; margin-top:4px;"><div style="background:#0b0d10; width:${percent}%; height:100%; border-radius:20px;"></div></div></div>`;
+  });
+  proofChart.appendChild(plist);
+
+  // Hero typing animation
+  (function initHeroTyping(){
+    const target = document.getElementById('heroTypeTarget');
+    if (!target) return;
+    const phrases = [
+      'which buyer survives both strategic and financial pressure',
+      'where the acquisition story flips by counterparty type',
+      'which sponsor thesis collapses under early-stage risk',
+      'which strategic buyer has the cleanest mandate fit',
+      'which buyer-and-narrative pair should lead the process'
+    ];
+    let phraseIndex = 0;
+    let charIndex = 0;
+    let deleting = false;
+    function tick(){
+      const phrase = phrases[phraseIndex];
+      if (!deleting) {
+        charIndex += 1;
+        target.textContent = phrase.slice(0, charIndex);
+        if (charIndex >= phrase.length) {
+          deleting = true;
+          setTimeout(tick, 1500);
+          return;
+        }
+        setTimeout(tick, 34);
+      } else {
+        charIndex -= 1;
+        target.textContent = phrase.slice(0, Math.max(0, charIndex));
+        if (charIndex <= 0) {
+          deleting = false;
+          phraseIndex = (phraseIndex + 1) % phrases.length;
+          setTimeout(tick, 300);
+          return;
+        }
+        setTimeout(tick, 18);
+      }
+    }
+    tick();
+  })();
+</script>
+</body>
+</html>
