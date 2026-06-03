@@ -1050,6 +1050,89 @@ main > .container > section:first-child::after {
   background:#D71920;
 }
 
+
+/* Institutional access section — no public checkout */
+.institutional-access .institutional-lead {
+  max-width: 760px;
+  margin-top: 18px;
+  font-size: 18px;
+  line-height: 1.45;
+  color: #30343b;
+  font-weight: 500;
+}
+.access-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 2px solid var(--line-heavy);
+  background: #fff;
+  box-shadow: 16px 16px 0 rgba(0,0,0,.12);
+}
+.access-card {
+  padding: 34px;
+  border-right: 2px solid var(--line-heavy);
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+.access-card:last-child {
+  border-right: 0;
+}
+.access-num {
+  font-family: 'Instrument Serif', serif;
+  font-size: 72px;
+  line-height: .8;
+  letter-spacing: -.06em;
+  color: #D71920;
+  margin-bottom: 28px;
+}
+.access-title {
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: -.04em;
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+.access-card p {
+  font-size: 15px;
+  line-height: 1.5;
+  color: #30343b;
+  max-width: 520px;
+  margin-bottom: 28px;
+}
+.access-btn {
+  margin-top: auto;
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  background: #D71920;
+  color: #fff;
+  border: 2px solid #D71920;
+  padding: 13px 18px;
+  font-weight: 800;
+  font-size: 13px;
+  box-shadow: 6px 6px 0 #08090b;
+  transition: transform .14s ease, box-shadow .14s ease;
+}
+.access-btn:hover {
+  transform: translate(-2px,-2px);
+  box-shadow: 9px 9px 0 #08090b;
+}
+@media (max-width: 760px) {
+  .access-grid {
+    grid-template-columns: 1fr;
+  }
+  .access-card {
+    border-right: 0;
+    border-bottom: 2px solid var(--line-heavy);
+  }
+  .access-card:last-child {
+    border-bottom: 0;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1067,7 +1150,7 @@ main > .container > section:first-child::after {
       <a href="#how">Method</a>
       <a href="#desk">Run</a>
       <a href="#proof">Proof</a>
-      <a href="#pricing">Pricing</a>
+      <a href="#pricing">Access</a>
       <a href="#desk" class="nav-cta">Open the desk</a>
     </div>
   </div>
@@ -1198,21 +1281,22 @@ main > .container > section:first-child::after {
       </div>
     </section>
 
-    <section id="pricing">
-      <div class="eyebrow">engagement</div>
-      <h2>Priced for active mandates.</h2>
-      <div class="price-grid" style="margin-top: 32px;">
-        <div class="price-card">
-          <div class="eyebrow">single mandate</div>
-          <div class="price-amount">$499</div>
-          <div style="margin: 20px 0;">One asset, full five‑pass brief: ranked buyer short list, strategic/financial lenses, positioning matrix, recommended structure, white‑label export.</div>
-          <button class="mini-btn solid" onclick="document.getElementById('desk').scrollIntoView()">Run a live brief</button>
+    <section id="pricing" class="institutional-access">
+      <div class="eyebrow">institutional access</div>
+      <h2>Contracted by mandate.</h2>
+      <p class="institutional-lead">Deal Desk is not sold as a self-serve checkout tool. Access is handled through direct institutional engagement, matter scoping, and secure deployment review.</p>
+      <div class="access-grid" style="margin-top: 32px;">
+        <div class="access-card">
+          <div class="access-num">01</div>
+          <div class="access-title">Matter Indexing</div>
+          <p>For a single live mandate. Submit an asset profile or CIM for buyer-universe mapping, narrative pressure testing, and an executive positioning brief.</p>
+          <a href="mailto:joel@actualgeneralintelligence.com?subject=Deal%20Desk%20%E2%80%94%20Matter%20Indexing%20Request" class="access-btn">Request Matter Indexing</a>
         </div>
-        <div class="price-card">
-          <div class="eyebrow">desk access</div>
-          <div class="price-amount">$1,500<span style="font-size: 20px;">/mo</span></div>
-          <div style="margin: 20px 0;">Unlimited briefs for active advisors. Saved buyer universes, white‑label PDF, local compute for confidential mandates.</div>
-          <a href="mailto:joel.d.trout.two@gmail.com?subject=Deal%20Desk%20subscription" class="mini-btn solid" style="display: inline-block; text-decoration: none;">Request desk access →</a>
+        <div class="access-card">
+          <div class="access-num">02</div>
+          <div class="access-title">On-Premise Docker Deployment</div>
+          <p>For firmwide use. Private local deployment, saved buyer universes, secure compute review, and institutional workflow integration.</p>
+          <a href="mailto:joel@actualgeneralintelligence.com?subject=Deal%20Desk%20%E2%80%94%20On-Premise%20Docker%20Deployment%20Request" class="access-btn">Request On-Premise Docker Deployment</a>
         </div>
       </div>
     </section>
@@ -1220,7 +1304,7 @@ main > .container > section:first-child::after {
   <footer>
     <div class="container">
       Actual General Intelligence Inc. · La Jolla, CA · ARBITER deterministic coherence engine (26MB, CPU‑only)<br>
-      Decision support only. Not investment advice or a solicitation.
+      Decision support only. Not investment advice or a solicitation. Institutional inquiries: joel@actualgeneralintelligence.com
     </div>
   </footer>
 </main>
